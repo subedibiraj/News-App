@@ -1,0 +1,64 @@
+import React, { Component } from 'react'
+import NewsItem from './NewsItem'
+
+export default class  extends Component {
+    articles = [
+        {
+          "source": {
+            "id": "australian-financial-review",
+            "name": "Australian Financial Review"
+          },
+          "author": "Patrick Durkin",
+          "title": "South Africa’s genocide case sparks Sharma, Baird, Geminder blow up",
+          "description": "Liberal Senator Dave Sharma has taken aim at Cricket Australia chairman Mike Baird, urging the former NSW premier to take action against Cricket South Africa, after accusing them of antisemitism.",
+          "url": "http://www.afr.com/world/middle-east/south-africa-s-genocide-case-sparks-sharma-baird-geminder-blow-up-20240117-p5ey2m",
+          "urlToImage": "https://static.ffx.io/images/$zoom_0.6999%2C$multiply_1%2C$ratio_1.777778%2C$width_1059%2C$x_329%2C$y_1078/t_crop_custom/c_scale%2Cw_800%2Cq_88%2Cf_jpg/t_afr_no_label_no_age_social_wm/14847ae475bd93b02d72a9fc0e741d483f2cb418",
+          "publishedAt": "2024-01-17T08:12:40Z",
+          "content": "Cricket South Africas media release cites the risk of conflict or even violence if Mr Teeger remained in his role during the Under-19 Cricket World Cup is set to start there on Friday.\r\nBut the demot… [+1187 chars]"
+        },
+        {
+          "source": { "id": "espn-cric-info", "name": "ESPN Cric Info" },
+          "author": null,
+          "title": "PCB hands Umar Akmal three-year ban from all cricket | ESPNcricinfo.com",
+          "description": "Penalty after the batsman pleaded guilty to not reporting corrupt approaches | ESPNcricinfo.com",
+          "url": "http://www.espncricinfo.com/story/_/id/29103103/pcb-hands-umar-akmal-three-year-ban-all-cricket",
+          "urlToImage": "https://a4.espncdn.com/combiner/i?img=%2Fi%2Fcricket%2Fcricinfo%2F1099495_800x450.jpg",
+          "publishedAt": "2020-04-27T11:41:47Z",
+          "content": "Umar Akmal's troubled cricket career has hit its biggest roadblock yet, with the PCB handing him a ban from all representative cricket for three years after he pleaded guilty of failing to report det… [+1506 chars]"
+        },
+        {
+          "source": { "id": "espn-cric-info", "name": "ESPN Cric Info" },
+          "author": null,
+          "title": "What we learned from watching the 1992 World Cup final in full again | ESPNcricinfo.com",
+          "description": "Wides, lbw calls, swing - plenty of things were different in white-ball cricket back then | ESPNcricinfo.com",
+          "url": "http://www.espncricinfo.com/story/_/id/28970907/learned-watching-1992-world-cup-final-full-again",
+          "urlToImage": "https://a4.espncdn.com/combiner/i?img=%2Fi%2Fcricket%2Fcricinfo%2F1219926_1296x729.jpg",
+          "publishedAt": "2020-03-30T15:26:05Z",
+          "content": "Last week, we at ESPNcricinfo did something we have been thinking of doing for eight years now: pretend-live ball-by-ball commentary for a classic cricket match. We knew the result, yes, but we tried… [+6823 chars]"
+        }
+      ]
+    constructor(){
+        super();
+        this.state = {
+            articles : this.articles,
+            loading : false,
+        }
+      }
+
+  render() {
+    return (
+        <div className="container my-3"> 
+            <h2 className='text-center'>News App - Top News</h2>
+            <div className="row my-4">
+                {this.articles.map((element)=>{
+                        return <div className="col-md-4" key={element.url}>
+                        <NewsItem title = {element.title.slice(0,44)} description = {element.description.slice(0,88)} imageUrl = {element.urlToImage} newsUrl = {element.url}/>
+                    </div>
+                })}
+                
+            </div>
+        
+        </div>
+    )
+  }
+}
