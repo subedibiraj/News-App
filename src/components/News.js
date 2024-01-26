@@ -1,64 +1,140 @@
-import React, { Component } from 'react'
-import NewsItem from './NewsItem'
+import React, { Component } from "react";
+import NewsItem from "./NewsItem";
+import Loader from "./Loader";
+import PropTypes from "prop-types";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-export default class  extends Component {
-    articles = [
-        {
-          "source": {
-            "id": "australian-financial-review",
-            "name": "Australian Financial Review"
-          },
-          "author": "Patrick Durkin",
-          "title": "South Africa’s genocide case sparks Sharma, Baird, Geminder blow up",
-          "description": "Liberal Senator Dave Sharma has taken aim at Cricket Australia chairman Mike Baird, urging the former NSW premier to take action against Cricket South Africa, after accusing them of antisemitism.",
-          "url": "http://www.afr.com/world/middle-east/south-africa-s-genocide-case-sparks-sharma-baird-geminder-blow-up-20240117-p5ey2m",
-          "urlToImage": "https://static.ffx.io/images/$zoom_0.6999%2C$multiply_1%2C$ratio_1.777778%2C$width_1059%2C$x_329%2C$y_1078/t_crop_custom/c_scale%2Cw_800%2Cq_88%2Cf_jpg/t_afr_no_label_no_age_social_wm/14847ae475bd93b02d72a9fc0e741d483f2cb418",
-          "publishedAt": "2024-01-17T08:12:40Z",
-          "content": "Cricket South Africas media release cites the risk of conflict or even violence if Mr Teeger remained in his role during the Under-19 Cricket World Cup is set to start there on Friday.\r\nBut the demot… [+1187 chars]"
-        },
-        {
-          "source": { "id": "espn-cric-info", "name": "ESPN Cric Info" },
-          "author": null,
-          "title": "PCB hands Umar Akmal three-year ban from all cricket | ESPNcricinfo.com",
-          "description": "Penalty after the batsman pleaded guilty to not reporting corrupt approaches | ESPNcricinfo.com",
-          "url": "http://www.espncricinfo.com/story/_/id/29103103/pcb-hands-umar-akmal-three-year-ban-all-cricket",
-          "urlToImage": "https://a4.espncdn.com/combiner/i?img=%2Fi%2Fcricket%2Fcricinfo%2F1099495_800x450.jpg",
-          "publishedAt": "2020-04-27T11:41:47Z",
-          "content": "Umar Akmal's troubled cricket career has hit its biggest roadblock yet, with the PCB handing him a ban from all representative cricket for three years after he pleaded guilty of failing to report det… [+1506 chars]"
-        },
-        {
-          "source": { "id": "espn-cric-info", "name": "ESPN Cric Info" },
-          "author": null,
-          "title": "What we learned from watching the 1992 World Cup final in full again | ESPNcricinfo.com",
-          "description": "Wides, lbw calls, swing - plenty of things were different in white-ball cricket back then | ESPNcricinfo.com",
-          "url": "http://www.espncricinfo.com/story/_/id/28970907/learned-watching-1992-world-cup-final-full-again",
-          "urlToImage": "https://a4.espncdn.com/combiner/i?img=%2Fi%2Fcricket%2Fcricinfo%2F1219926_1296x729.jpg",
-          "publishedAt": "2020-03-30T15:26:05Z",
-          "content": "Last week, we at ESPNcricinfo did something we have been thinking of doing for eight years now: pretend-live ball-by-ball commentary for a classic cricket match. We knew the result, yes, but we tried… [+6823 chars]"
-        }
-      ]
-    constructor(){
-        super();
-        this.state = {
-            articles : this.articles,
-            loading : false,
-        }
-      }
+export default class News extends Component {
+  static defaultProps = {
+    country: "us",
+    pageSize: "9",
+    category: "general",
+  };
+
+  static propTypes = {
+    country: PropTypes.string,
+    pageSize: PropTypes.number,
+    category: PropTypes.string,
+  };
+
+  constructor() {
+    super();
+    this.state = {
+      articles: [],
+      loading: false,
+      page: 1,
+      totalResults: 0,
+    };
+  }
+
+  async componentDidMount() {
+    this.updateNews();
+    document.title = `${this.formatCategory(this.props.category)} - News App`
+  }
+
+  async updateNews() {
+    this.props.setProgress(10);
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    this.setState({ loading: true });
+    let data = await fetch(url);
+    this.props.setProgress(30);
+    let parsedData = await data.json();
+    this.props.setProgress(100);
+    this.setState({
+      articles: parsedData.articles,
+      totalResults: parsedData.totalResults,
+      loading: false,
+    });
+    this.props.setProgress(100);
+  }
+
+  toggleNext = async () => {
+    this.setState({ page: this.state.page + 1 });
+    this.updateNews();
+  };
+
+  togglePrev = async () => {
+    this.setState({ page: this.state.page - 1 });
+    this.updateNews();
+  };
+
+  formatCategory(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1); //Captitalizing the first letter of the category
+  }
+
+  fetchMoreData = async() => {
+    this.setState({page:this.state.page + 1});
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    this.setState({ loading: true });
+    let data = await fetch(url);
+    let parsedData = await data.json();
+    this.setState({
+      articles: this.state.articles.concat(parsedData.articles),
+      totalResults: parsedData.totalResults,
+      loading: false,
+    });
+  }
 
   render() {
     return (
-        <div className="container my-3"> 
-            <h2 className='text-center'>News App - Top News</h2>
-            <div className="row my-4">
-                {this.articles.map((element)=>{
-                        return <div className="col-md-4" key={element.url}>
-                        <NewsItem title = {element.title.slice(0,44)} description = {element.description.slice(0,88)} imageUrl = {element.urlToImage} newsUrl = {element.url}/>
-                    </div>
-                })}
-                
-            </div>
-        
+      <>
+        <h2 className="text-center mt-4">
+          <strong>
+            News App - {this.formatCategory(this.props.category)} News
+          </strong>
+        </h2>
+        {this.state.loading && <Loader />}
+        <InfiniteScroll
+          dataLength={this.state.articles.length}
+          next={this.fetchMoreData}
+          hasMore={this.state.articles.length < this.state.totalResults}
+          loader={<Loader />}
+        >
+          <div className="container">
+        <div className="row my-4">
+          {this.state.articles.map((element) => {
+              return (
+                <div className="col-md-4" key={element.url}>
+                  <NewsItem
+                    title={element.title ? element.title.slice(0, 44) : ""}
+                    description={
+                      element.description
+                        ? element.description.slice(0, 88)
+                        : ""
+                    }
+                    imageUrl={element.urlToImage}
+                    newsUrl={element.url}
+                    publishedAt={element.publishedAt}
+                  />
+                </div>
+              );
+            })}
         </div>
-    )
+        </div>
+        </InfiniteScroll>
+        {/* <div className="container d-flex justify-content-between">
+          <button
+            type="button"
+            disabled={this.state.page <= 1}
+            className="btn btn-info"
+            onClick={this.togglePrev}
+            name="prev"
+          >
+            &larr; Previous
+          </button>
+          <button
+            type="button"
+            disabled={
+              this.state.page >= Math.ceil(this.state.totalResults / 20)
+            }
+            className="btn btn-info"
+            onClick={this.toggleNext}
+            name="next"
+          >
+            Next &rarr;
+          </button>
+        </div> */}
+      </>
+    );
   }
 }
