@@ -48,8 +48,8 @@ const News = (props) => {
   }
 
   const fetchMoreData = async() => {
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${page+1}&pageSize=${props.pageSize}`;
     setPage(page + 1);
-    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
     setLoading(true);
     let data = await fetch(url);
     let parsedData = await data.json();
@@ -60,7 +60,7 @@ const News = (props) => {
 
     return (
       <>
-        <h2 className="text-center mt-4">
+        <h2 className="text-center" style= {{marginTop: '90px'}}>
           <strong>
             News App - {formatCategory(props.category)} News
           </strong>
